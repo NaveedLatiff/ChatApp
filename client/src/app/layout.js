@@ -11,7 +11,7 @@ const outfit = Outfit({
 });
 
 export const metadata = {
-  title: "QuickChat Web",
+  title: "Pingly - Chat App",
   description: "Real-time messaging application",
 };
 

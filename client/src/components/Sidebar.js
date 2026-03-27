@@ -4,7 +4,6 @@ import Axios from '../../axios';
 import { User, MoreVertical, Settings, LogOut, Search } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
-import Loader from './Loader';
 
 const Sidebar = ({ selectedUser, setSelectedUser }) => {
     const { logout, onlineUsers, socket, user: currentUser } = useAuth();

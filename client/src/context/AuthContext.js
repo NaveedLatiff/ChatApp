@@ -2,12 +2,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import Axios from "../../axios";
 import { useRouter, usePathname } from "next/navigation";
-import { io } from "socket.io-client";
-import { toast } from "react-toastify";
-import Loader from "@/components/Loader";
+import { io } from "socket.io-client"
+import { toast } from "react-toastify"
+import Loader from "@/components/Loader"
 
-const AuthContext = createContext();
-const SOCKET_URL = "http://localhost:3003"; 
+const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -15,12 +14,12 @@ export const AuthProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
     const [onlineUsers, setOnlineUsers] = useState([]);
     
-    const router = useRouter();
-    const pathname = usePathname();
+    const router = useRouter()
+    const pathname = usePathname()
 
     const connectSocket = (userId) => {
         if (socket?.connected) return;
-        const newSocket = io(SOCKET_URL, { 
+        const newSocket = io(process.env.NEXT_PUBLIC_BACKEND_URL, { 
             query: { userId },
             reconnection: true 
         });
@@ -60,30 +59,25 @@ export const AuthProvider = ({ children }) => {
             if (res.data.success) {
                 setUser(res.data.user);
                 connectSocket(res.data.user._id);
-                // SUCCESS MESSAGE
                 toast.success(`Welcome back, ${res.data.user.fullName || 'User'}!`);
                 router.push("/");
                 return res.data;
             } else {
-                // If backend returns success: false
                 toast.error(res.data.message || "Login failed");
             }
         } catch (error) {
-            // ERROR MESSAGE (Backend error or Network error)
             const msg = error.response?.data?.message || "Invalid email or password";
             toast.error(msg);
             return { success: false, message: msg };
         }
     };
 
-    // RENAMED TO 'register' to match your AuthPage.jsx UI
     const register = async (formData) => {
         try {
             const res = await Axios.post("/auth/register", formData);
             if (res.data.success) {
                 setUser(res.data.user);
                 connectSocket(res.data.user._id);
-                // SUCCESS MESSAGE
                 toast.success("Account created successfully!");
                 router.push("/");
                 return res.data;
@@ -91,7 +85,6 @@ export const AuthProvider = ({ children }) => {
                 toast.error(res.data.message || "Registration failed");
             }
         } catch (error) {
-            // ERROR MESSAGE
             const msg = error.response?.data?.message || "Registration failed. Try again.";
             toast.error(msg);
             return { success: false, message: msg };
@@ -118,7 +111,7 @@ export const AuthProvider = ({ children }) => {
             if (!user && !isPublicPage) {
                 router.push("/login");
             } else if (user && isPublicPage) {
-                router.push("/");
+                router.push("/")
             }
         }
     }, [user, loading, pathname, router]);
