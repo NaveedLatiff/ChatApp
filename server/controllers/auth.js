@@ -6,7 +6,7 @@ import cloudinary from "../config/cloudinary.js";
 export const register = async (req, res) => {
     const { fullName, email, password } = req.body;
 
-    if (!fullName || !email || !password ) { 
+    if (!fullName || !email || !password) {
         return res.json({ success: false, message: "Please Fill In All The Fields" });
     }
 
@@ -19,25 +19,26 @@ export const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await User.create({
-            fullName, 
-            email, 
+            fullName,
+            email,
             password: hashedPassword,
-            
+
         });
 
         const token = jwt.sign({ id: user._id }, process.env.SESSION_SECRET, { expiresIn: '7d' });
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
-
+res.cookie("token", token, {
+    httpOnly: true,
+    // Change these two specifically:
+    secure: true, 
+    sameSite: "none", 
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000
+});
         return res.json({
             success: true,
             message: "User Registered Successfully",
-            user 
+            user
         });
 
     } catch (err) {
@@ -76,13 +77,14 @@ export const login = async (req, res) => {
 
         const token = jwt.sign({ id: user._id }, process.env.SESSION_SECRET, { expiresIn: '7d' })
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        })
-
+res.cookie("token", token, {
+    httpOnly: true,
+    // Change these two specifically:
+    secure: true, 
+    sameSite: "none", 
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000
+});
         return res.json({
             success: true,
             message: "Login Successfully",
@@ -156,12 +158,12 @@ export const updateProfile = async (req, res) => {
     try {
         const userId = req.userId;
         const { profilePic, fullName, bio } = req.body;
-        
+
         let updateData = { fullName, bio };
 
         if (profilePic) {
             const uploadResponse = await cloudinary.uploader.upload(profilePic, {
-                folder: "chatapp-profileImages", 
+                folder: "chatapp-profileImages",
             });
             updateData.profilePic = uploadResponse.secure_url;
         }

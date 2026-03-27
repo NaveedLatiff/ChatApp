@@ -14,8 +14,9 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
-    credentials: true
+    origin: "http://localhost:3000", 
+    credentials: true,
+    methods: ["GET", "POST"]
   }
 });
 
@@ -63,13 +64,19 @@ connectDB();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+
+app.use(cors({ 
+  origin: "http://localhost:3000", 
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 app.use('/auth', authRouter);
 app.use('/message', messageRouter);
 
 server.listen(PORT, () => {
-    console.log(`Server (with Socket.io) is running on http://localhost:${PORT}`);
+    console.log(`Server (with Socket.io) is running on port ${PORT}`);
 });
 
 export { app, io, server, userSocketMap };

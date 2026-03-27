@@ -21,7 +21,8 @@ export const AuthProvider = ({ children }) => {
         if (socket?.connected) return;
         const newSocket = io(process.env.NEXT_PUBLIC_BACKEND_URL, { 
             query: { userId },
-            reconnection: true 
+            reconnection: true ,
+            withCredentials: true
         });
         setSocket(newSocket);
         newSocket.on("getOnlineUsers", (users) => setOnlineUsers(users));
