@@ -1,9 +1,7 @@
 import jwt from "jsonwebtoken";
 
 const userAuth = async (req, res, next) => {
-    // 1. Try to get token from Cookies
-    // 2. If no cookie, try to get it from the 'Authorization' header (Bearer Token)
-    const token = req.cookies?.token || req.headers.authorization?.split(" ")[1]; 
+    const token = req.cookies?.token  
     
     if (!token) {
         return res.status(401).json({

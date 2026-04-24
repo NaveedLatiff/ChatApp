@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
-import { MessageSquare, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { toast } from 'react-toastify';
 import img from '../../assets/main.png'
 import Image from 'next/image';

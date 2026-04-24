@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState, useRef } from 'react';
-import { User, Image as ImageIcon, X, Loader, CheckCheck, Check, ArrowLeft, } from 'lucide-react';
+import { User, X, Loader, CheckCheck, Check, ArrowLeft, } from 'lucide-react';
 import Axios from '../../axios';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'react-toastify';

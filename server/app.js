@@ -14,7 +14,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000", 
+    origin: "*", 
     credentials: true,
     methods: ["GET", "POST"]
   }
@@ -66,7 +66,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
 
 app.use(cors({ 
-  origin: "http://localhost:3000", 
+  origin: "*", 
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]

@@ -3,7 +3,6 @@ import {  Image as ImageIcon, Send, X, Loader, Smile } from 'lucide-react';
 import EmojiPicker from 'emoji-picker-react';
 import React, { useEffect, useState, useRef } from 'react';
 import Axios from '../../axios';
-import { useAuth } from '@/context/AuthContext';
 import { toast } from 'react-toastify';
 
 
@@ -57,8 +56,7 @@ const MessageInput = ({ selectedUser, setMessages }) => {
 
     return (
         <div className="p-[10px] bg-white/5 backdrop-blur-md border border-white/10 shrink-0 border-t relative">
-            {/* Emoji Picker Popover */}
-            {showEmojiPicker && (
+           {showEmojiPicker && (
                 <div className="absolute bottom-[70px] left-2 z-50 shadow-2xl" ref={emojiPickerRef}>
                     <EmojiPicker 
                         theme="dark" 

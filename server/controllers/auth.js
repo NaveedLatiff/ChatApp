@@ -27,14 +27,13 @@ export const register = async (req, res) => {
 
         const token = jwt.sign({ id: user._id }, process.env.SESSION_SECRET, { expiresIn: '7d' });
 
-res.cookie("token", token, {
-    httpOnly: true,
-    // Change these two specifically:
-    secure: true, 
-    sameSite: "none", 
-    path: "/",
-    maxAge: 7 * 24 * 60 * 60 * 1000
-});
+        res.cookie("token", token, {
+            httpOnly: true,
+           secure: true,
+            sameSite: "none",
+            path: "/",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
         return res.json({
             success: true,
             message: "User Registered Successfully",
@@ -77,14 +76,13 @@ export const login = async (req, res) => {
 
         const token = jwt.sign({ id: user._id }, process.env.SESSION_SECRET, { expiresIn: '7d' })
 
-res.cookie("token", token, {
-    httpOnly: true,
-    // Change these two specifically:
-    secure: true, 
-    sameSite: "none", 
-    path: "/",
-    maxAge: 7 * 24 * 60 * 60 * 1000
-});
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            path: "/",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
         return res.json({
             success: true,
             message: "Login Successfully",
@@ -168,8 +166,7 @@ export const updateProfile = async (req, res) => {
             updateData.profilePic = uploadResponse.secure_url;
         }
 
-        // 2. Update the user in one clean go
-        const updatedUser = await User.findByIdAndUpdate(
+       const updatedUser = await User.findByIdAndUpdate(
             userId,
             { $set: updateData },
             { new: true }

@@ -104,7 +104,6 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Route Protection Logic
     useEffect(() => {
         if (!loading) {
             const publicPages = ["/login", "/signup"];
