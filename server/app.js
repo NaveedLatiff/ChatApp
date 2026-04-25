@@ -7,17 +7,17 @@ import cookieParser from "cookie-parser";
 import messageRouter from "./routes/message.js";
 import http from "http";
 import { Server } from "socket.io";
-import Message from "./models/message.js"; 
+import Message from "./models/message.js";
 
 const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: {
-    origin: ["http://localhost:3000", "http://23.21.144.198"], 
-    credentials: true,
-    methods: ["GET", "POST"]
-  }
+    cors: {
+        origin: ["http://localhost:3000", "http://23.21.144.198", "pingly.duckdns.org"],
+        credentials: true,
+        methods: ["GET", "POST"]
+    }
 });
 
 const userSocketMap = {};
@@ -38,7 +38,7 @@ io.on("connection", (socket) => {
             const senderSocketId = userSocketMap[senderId];
             if (senderSocketId) {
                 io.to(senderSocketId).emit("messagesSeen", {
-                    seenBy: receiverId 
+                    seenBy: receiverId
                 });
             }
         } catch (error) {
@@ -54,7 +54,7 @@ io.on("connection", (socket) => {
 });
 
 app.use((req, res, next) => {
-    req.io = io; 
+    req.io = io;
     next();
 });
 
@@ -65,11 +65,11 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
 
-app.use(cors({ 
-  origin: ["http://localhost:3000", "http://23.21.144.198"], 
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+app.use(cors({
+    origin: ["http://localhost:3000", "http://23.21.144.198", "pingly.duckdns.org"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use('/auth', authRouter);
