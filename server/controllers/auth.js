@@ -29,11 +29,11 @@ export const register = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-           secure: true,
-            sameSite: "none",
-            path: "/",
-            maxAge: 7 * 24 * 60 * 60 * 1000
+            secure: false, 
+            sameSite: "lax", 
+            maxAge: 7 * 24 * 60 * 60 * 1000, 
         });
+
         return res.json({
             success: true,
             message: "User Registered Successfully",
@@ -78,11 +78,11 @@ export const login = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            path: "/",
-            maxAge: 7 * 24 * 60 * 60 * 1000
+            secure: false,
+            sameSite: "lax", 
+            maxAge: 7 * 24 * 60 * 60 * 1000, 
         });
+
         return res.json({
             success: true,
             message: "Login Successfully",
@@ -103,8 +103,9 @@ export const logout = async (req, res) => {
     try {
         res.clearCookie('token', {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax", 
 
         })
         return res.json({
@@ -166,7 +167,7 @@ export const updateProfile = async (req, res) => {
             updateData.profilePic = uploadResponse.secure_url;
         }
 
-       const updatedUser = await User.findByIdAndUpdate(
+        const updatedUser = await User.findByIdAndUpdate(
             userId,
             { $set: updateData },
             { new: true }

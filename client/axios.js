@@ -5,4 +5,6 @@ const Axios = axios.create({
   withCredentials: true, 
 });
 
+Axios.defaults.withCredentials = true;
+
 export default Axios;
