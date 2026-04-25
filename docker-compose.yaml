@@ -1,15 +1,23 @@
 version: '3.8'
+
 services:
   backend:
     build: ./server
+    container_name: pingly_backend_1
     ports:
       - "3003:3003"
+    env_file:
+      - ./server/.env
     restart: always
+
   frontend:
-    build: ./client
-    args:
+    build:
+      context: ./client
+      args:
         - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
     container_name: pingly_frontend_1
     ports:
       - "3000:3000"
+    env_file:
+      - ./client/.env
     restart: always
