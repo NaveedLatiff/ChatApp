@@ -24,7 +24,7 @@ jobs:
             git reset --hard origin/master
             
             
-            export NEXT_PUBLIC_BACKEND_URL="http://pinglly.duckdns.org/api"
+            export NEXT_PUBLIC_BACKEND_URL="http://pingly.duckdns.org/api"
 
             docker-compose down
             docker-compose up --build -d
