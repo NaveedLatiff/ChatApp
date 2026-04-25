@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState, useRef } from 'react';
 import Axios from '../../axios';
-import { User, MoreVertical, Settings, LogOut, Search } from 'lucide-react';
+import { User, MoreVertical, Settings, LogOut, Search, X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 
@@ -12,8 +12,16 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
     const [error, setError] = useState(null);
     const [showMenu, setShowMenu] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
+    const [fullscreenImage, setFullscreenImage] = useState(null);
     
     const menuRef = useRef(null);
+    const sortUsers = (userList) => {
+        return [...userList].sort((a, b) => {
+            const aUnseen = a.unseenCount || 0;
+            const bUnseen = b.unseenCount || 0;
+            return bUnseen - aUnseen;
+        });
+    };
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -21,7 +29,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
                 setLoading(true);
                 const { data } = await Axios.get('/message/users');
                 if (data.success) {
-                    setUsers(data.users);
+                    setUsers(sortUsers(data.users));
                 } else {
                     setError(data.message);
                 }
@@ -37,21 +45,24 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
     useEffect(() => {
         if (!socket) return;
 
-        const handleUpdateNotification = ({ senderId, type }) => {
-            if (type === "new_message") {
-                setUsers((prevUsers) =>
-                    prevUsers.map((user) => {
-                        if (user._id === senderId && selectedUser?._id !== senderId) {
-                            return { 
-                                ...user, 
-                                unseenCount: (user.unseenCount || 0) + 1 
-                            };
-                        }
-                        return user;
-                    })
-                );
+   const handleUpdateNotification = ({ senderId, type }) => {
+    if (type === "new_message") {
+        setUsers((prevUsers) => {
+            const userIndex = prevUsers.findIndex(u => u._id === senderId);
+            if (userIndex === -1) return prevUsers; 
+            const updatedUsers = [...prevUsers];
+            const targetUser = { ...updatedUsers[userIndex] };
+
+           if (selectedUser?._id !== senderId) {
+                targetUser.unseenCount = (targetUser.unseenCount || 0) + 1;
             }
-        };
+
+            updatedUsers.splice(userIndex, 1);
+
+            return [targetUser, ...updatedUsers];
+        });
+    }
+};
 
         socket.on("updateNotification", handleUpdateNotification);
 
@@ -90,16 +101,20 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
     );
 
     return (
-        <div className="h-full flex flex-col bg-white/5 backdrop-blur-md border border-white/10  w-full border-r ">
-            <div className=" px-4 py-[10px] flex justify-between items-center shrink-0">
-                <div className="cursor-pointer">
-                    {currentUser?.profilePic ? (
-                        <img src={currentUser.profilePic} className="w-10 h-10 rounded-full object-cover" alt="Me" />
-                    ) : (
-                        <div className="w-10 h-10 rounded-full bg-[#6a7175] flex items-center justify-center">
+        <div className="h-full flex flex-col bg-white/5 backdrop-blur-md border border-white/10 w-full border-r">
+            {/* Header */}
+            <div className="px-4 py-[10px] flex justify-between items-center shrink-0">
+                <div 
+                    className="cursor-pointer transition-transform active:scale-95 shrink-0" 
+                    onClick={() => setFullscreenImage(currentUser?.profilePic || "https://cdn-icons-png.flaticon.com/512/149/149071.png")}
+                >
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-[#6a7175] flex items-center justify-center">
+                        {currentUser?.profilePic ? (
+                            <img src={currentUser.profilePic} className="w-full h-full object-cover" alt="Me" />
+                        ) : (
                             <User className="w-6 h-6 text-[#cfd3d5]" />
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
                 
                 <div className="flex items-center gap-2 relative" ref={menuRef}>
@@ -129,6 +144,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
                 </div>
             </div>
 
+            {/* Search */}
             <div className="px-3 py-2 ">
                 <div className="relative flex items-center bg-zinc-900/80 rounded-lg px-3">
                     <Search className="w-4 h-4 text-[#8696a0]" />
@@ -165,14 +181,17 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
                                 className={`flex items-center gap-3 px-3 py-3 cursor-pointer transition-colors relative
                                     ${isSelected ? 'bg-[#2a3942]' : 'hover:bg-[#202c33]'}`}
                             >
-                                <div className="relative shrink-0">
-                                    {user.profilePic ? (
-                                        <img src={user.profilePic} className="w-12 h-12 rounded-full object-cover" alt="" />
-                                    ) : (
-                                        <div className="w-12 h-12 rounded-full bg-[#6a7175] flex items-center justify-center">
+                                <div className="relative shrink-0" onClick={(e) => {
+                                    e.stopPropagation();
+                                    setFullscreenImage(user.profilePic || "https://cdn-icons-png.flaticon.com/512/149/149071.png");
+                                }}>
+                                    <div className="w-12 h-12 rounded-full overflow-hidden hover:opacity-80 transition-all active:scale-95 bg-[#6a7175] flex items-center justify-center">
+                                        {user.profilePic ? (
+                                            <img src={user.profilePic} className="w-full h-full object-cover" alt="" />
+                                        ) : (
                                             <User className="w-7 h-7 text-[#cfd3d5]" />
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
                                     {isOnline && (
                                         <span className="absolute bottom-0.5 right-0.5 w-3 h-3 bg-[#00a884] border-2 border-[#111b21] rounded-full" />
                                     )}
@@ -203,6 +222,38 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
                     })
                 )}
             </div>
+            
+            {fullscreenImage && (
+                <div 
+                    className="fixed inset-0 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 z-[9999]"
+                    onClick={() => setFullscreenImage(null)}
+                >
+                    <button 
+                        className="absolute top-6 right-6 p-2 bg-[#202c33] rounded-full text-white hover:bg-[#313d45] transition-colors z-[10000]"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setFullscreenImage(null);
+                        }}
+                    >
+                        <X className="w-6 h-6 cursor-pointer" />
+                    </button>
+
+                    <div className="relative w-full max-w-[350px] aspect-square rounded-full overflow-hidden border-4 border-white/10 shadow-2xl">
+                        {fullscreenImage.includes("cdn-icons-png") ? (
+                            <div className="w-full h-full bg-[#6a7175] flex items-center justify-center">
+                                <User className="w-32 h-32 text-[#cfd3d5]" />
+                            </div>
+                        ) : (
+                            <img 
+                                src={fullscreenImage} 
+                                alt="Preview" 
+                                className="w-full h-full object-cover"
+                                onClick={(e) => e.stopPropagation()} 
+                            />
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

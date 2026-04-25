@@ -1,12 +1,13 @@
 "use client"
-import React from 'react';
-import { User, ChevronRight, Image as ImageIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, ChevronRight, Image as ImageIcon, X } from 'lucide-react'; 
 
 const RightSidebar = ({ selectedUser, messages = [] }) => {
+    const [fullscreenImage, setFullscreenImage] = useState(null); 
     const sharedMedia = messages.filter(msg => msg.image && msg.image.trim() !== "");
 
     return (
-        <div className="hidden lg:flex flex-col w-full  border-l border-[#313d45] h-full overflow-hidden">
+        <div className="hidden lg:flex flex-col w-full border-l border-[#313d45] h-full overflow-hidden">
             <div className="bg-white/5 backdrop-blur-md border border-white/10 px-4 py-[14px] flex items-center shrink-0">
                 <h2 className="text-[#e9edef] text-base font-normal">Contact info</h2>
             </div>
@@ -58,6 +59,7 @@ const RightSidebar = ({ selectedUser, messages = [] }) => {
                                     <div key={msg._id} className="aspect-square bg-[#202c33] rounded-sm overflow-hidden cursor-pointer">
                                         <img 
                                             src={msg.image} 
+                                            onClick={() => setFullscreenImage(msg.image)} // Open on click
                                             className="w-full h-full object-cover hover:scale-105 transition-transform duration-200" 
                                             alt="Shared media" 
                                         />
@@ -70,6 +72,26 @@ const RightSidebar = ({ selectedUser, messages = [] }) => {
                     </div>
                 </div>
             </div>
+
+            {fullscreenImage && (
+                <div 
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+                    onClick={() => setFullscreenImage(null)}
+                >
+                    <button 
+                        className="absolute top-6 right-6 p-2 bg-[#202c33] rounded-full text-white hover:bg-[#313d45] transition-colors"
+                        onClick={() => setFullscreenImage(null)}
+                    >
+                        <X className="w-6 h-6 cursor-pointer" />
+                    </button>
+                    <img 
+                        src={fullscreenImage} 
+                        alt="Full size" 
+                        className="max-w-full max-h-[90vh] object-contain rounded-md shadow-2xl"
+                        onClick={(e) => e.stopPropagation()} 
+                    />
+                </div>
+            )}
         </div>
     );
 };

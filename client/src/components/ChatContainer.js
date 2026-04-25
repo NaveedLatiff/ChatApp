@@ -6,11 +6,10 @@ import { useAuth } from '@/context/AuthContext';
 import { toast } from 'react-toastify';
 import MessageInput from './MessageInput';
 
-
-
 const ChatContainer = ({ selectedUser, setSelectedUser, messages, setMessages }) => {
     const { user: authUser, socket, onlineUsers } = useAuth();
     const [loading, setLoading] = useState(false);
+    const [fullscreenImage, setFullscreenImage] = useState(null);
     const messageEndRef = useRef(null);
     const isOnline = onlineUsers.includes(selectedUser?._id);
 
@@ -128,7 +127,12 @@ const ChatContainer = ({ selectedUser, setSelectedUser, messages, setMessages })
                                     <div className={`max-w-[85%] md:max-w-[65%] px-2 py-1.5 rounded-lg shadow-sm relative ${isMe ? 'bg-[#005c4b] text-[#e9edef]' : 'bg-[#202c33] text-[#e9edef]'
                                         }`}>
                                         {msg.image && (
-                                            <img src={msg.image} className="rounded-md mb-1 max-h-72 w-full object-cover" alt="attachment" />
+                                            <img 
+                                                src={msg.image} 
+                                                onClick={() => setFullscreenImage(msg.image)} 
+                                                className="rounded-md mb-1 max-h-72 w-full object-cover cursor-pointer hover:opacity-90 transition-opacity" 
+                                                alt="attachment" 
+                                            />
                                         )}
                                         {msg.text && (
                                             <p className="text-[14.2px] leading-relaxed pr-12 break-words">{msg.text}</p>
@@ -152,6 +156,29 @@ const ChatContainer = ({ selectedUser, setSelectedUser, messages, setMessages })
                 <div ref={messageEndRef} className="pb-2" />
             </main>
             <MessageInput selectedUser={selectedUser} setMessages={setMessages} />
+
+           {fullscreenImage && (
+                <div 
+                    className="fixed inset-0 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 z-[9999]"
+                    onClick={() => setFullscreenImage(null)}
+                >
+                    <button 
+                        className="absolute top-6 right-6 p-2 bg-[#202c33] rounded-full text-white hover:bg-[#313d45] transition-colors z-[10000]"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setFullscreenImage(null);
+                        }}
+                    >
+                        <X className="w-6 h-6 cursor-pointer"  />
+                    </button>
+                    <img 
+                        src={fullscreenImage} 
+                        alt="Full size" 
+                        className="max-w-full max-h-[90vh] object-contain rounded-md shadow-2xl"
+                        onClick={(e) => e.stopPropagation()} 
+                    />
+                </div>
+            )}
         </div>
     );
 };
